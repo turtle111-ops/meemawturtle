@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Stream</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        #stream-container {
+            position: relative;
+            max-width: 100%;
+            margin: auto;
+        }
+        #fullscreen-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #000;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Watch Stream</h1>
+    </header>
+    <div id="stream-container">
+        <h2 id="match-title"></h2>
+        <div id="iframe-container"></div>
+        <!-- <button id="fullscreen-button" onclick="goFullScreen()">Go Fullscreen</button> -->
+    </div>
+    <footer>
+        &copy; 2024 Your Streaming Service
+    </footer>
+
+    <script>
+        // // Function to go fullscreen
+        // function goFullScreen() {
+        //     const iframe = document.querySelector("iframe");
+        //     if (iframe.requestFullscreen) {
+        //         iframe.requestFullscreen();
+        //     } else if (iframe.mozRequestFullScreen) { // Firefox
+        //         iframe.mozRequestFullScreen();
+        //     } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, Opera
+        //         iframe.webkitRequestFullscreen();
+        //     } else if (iframe.msRequestFullscreen) { // IE/Edge
+        //         iframe.msRequestFullscreen();
+        //     }
+        // }
+
+        // Get query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get("matchId");
+        const server = urlParams.get("server");
+        const streamId = urlParams.get("streamId");
+
+        if (!matchId || !server || !streamId) {
+            document.getElementById("iframe-container").innerHTML = "<p>Error: Missing match ID, server, or stream ID information.</p>";
+        } else {
+            document.getElementById("match-title").textContent = `Match ID: ${matchId}`;
+
+            // Construct the API URL to get the stream data for a specific stream ID
+            fetch(`https://streamed.su/api/stream/${server}/${matchId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const stream = data.find(stream => stream.id === streamId);
+                    if (stream) {
+                        // Display the selected stream using an iframe
+                        const iframe = document.createElement("iframe");
+                        iframe.src = stream.embedUrl; // Assuming each stream has an embed URL
+                        iframe.width = "800"; // Adjust the width as needed
+                        iframe.height = "450"; // Adjust the height as needed
+                        iframe.frameBorder = "0";
+                        iframe.allowFullscreen = true; // Enable fullscreen support
+                        document.getElementById("iframe-container").appendChild(iframe);
+                    } else {
+                        document.getElementById("iframe-container").innerHTML = "<p>Error: Stream not found.</p>";
+                    }
+                })
+                .catch(err => {
+                    console.error("Error loading stream:", err);
+                    document.getElementById("iframe-container").innerHTML = "<p>Error loading stream. Please try again later.</p>";
+                });
+        }
+    </script>
+</body>
+</html>
