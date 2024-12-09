@@ -95,6 +95,7 @@ function searchMatches() {
 }
 
 // Function to fetch and display streams for a selected match
+// Function to fetch and display streams for a selected match
 function fetchStreams() {
     const urlParams = new URLSearchParams(window.location.search);
     const matchId = urlParams.get("matchId");
@@ -133,7 +134,7 @@ function fetchStreams() {
 
                         const streamButton = document.createElement("button");
                         // Use "Stream X" format, or fallback to "Stream" if title is undefined
-                        streamButton.textContent = `Stream ${index + 1}`;
+                        streamButton.textContent = stream.source || `Stream ${index + 1}`;  // Use the source property for button text
                         streamButton.className = "stream-button";
                         streamButton.onclick = () => {
                             // Navigate to watch.html with matchId, server, and streamId as query parameters
@@ -153,6 +154,8 @@ function fetchStreams() {
     });
 }
 
+
+// Function to fetch and display streams for a selected match
 // Function to fetch and display streams for a selected match
 function displayStream() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -180,7 +183,12 @@ function displayStream() {
                     iframe.width = "800"; // Adjust as needed
                     iframe.height = "450"; // Adjust as needed
                     iframe.frameBorder = "0";
-                    iframe.setAttribute('allowFullScreen', '')
+                    iframe.setAttribute('allowFullScreen', '');
+
+                    // Optionally, display the source label
+                    const sourceLabel = document.createElement("p");
+                    sourceLabel.textContent = `Source: ${stream.source}`;
+                    streamContainer.appendChild(sourceLabel);
                     streamContainer.appendChild(iframe);
                 });
             } else {
@@ -192,6 +200,7 @@ function displayStream() {
             document.getElementById("stream-container").innerHTML = "<p>Error loading stream. Please try again later.</p>";
         });
 }
+
 
 // Initialize the page based on the current page URL
 window.onload = function () {
